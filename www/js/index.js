@@ -27,35 +27,66 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
+        document.getElementById("btn").addEventListener("click", app.locationBtn);
+        
     },
     // deviceready Event Handler
     //
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-       app.receivedEvent('deviceready');
-		app.loadBooks();
-	},
-	
-	loadBooks: function(){
-		var request = new XMLHttpRequest();
+        app.receivedEvent('deviceready');
 		
-		request.open("GET","https://dl.dropboxusercontent.com/u/887989/MAD9135/2014-09-11/books.json",true);
-		request.onreadystatechange = function(){
+        
+	},
+    
+    locationBtn : function(){
+        var textBox = document.getElementById("textBox");
+        
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback,
+            {
+                enableHighAccuracy : true,
+                timeout : 5000
+            });
+        
+        function successCallback(position){
+            var msg = "You are at latitude = " + position.coords.latitude + " longitude = " +           position.coords.longitude;
+            
+            textBox.innerHTML = msg;
+            
+            
+            var request = new XMLHttpRequest();
+		
+            request.open("GET","http://open.mapquestapi.com/geocoding/v1/reverse?" + 
+"key=Fmjtd|luur2hurn0%2Cbg%3Do5-9wasly&location=" +
+position.coords.latitude + "," + position.coords.longitude,true);
+		
+            
+        request.onreadystatechange = function(){
+            
 			if(request.readyState === 4) {
 				if(request.status === 200 || request.status === 0){
-					//console.log("response: " + request.responseText);
-					var books = JSON.parse(request.responseText);
-					for(var i = 0 ; i< books.length ; i++){
-						console.log(books[i].Title);
-						var bookDiv = document.getElementById("books");
-						bookDiv.innerHTML = books[i].Title;
-					}
+					console.log("response: " + request.responseText);
+                    var map = JSON.parse(request.responseText);
+                    alert(map.results.locations);
 				}
-			}
-		};
+            }
+            
+          
+        }
+        
 		request.send();
-	},
+        
+        
+        
+        }
+        
+        function errorCallback(error){
+            alert(error.code);
+        }
+    },
+	
+	
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         var parentElement = document.getElementById(id);
