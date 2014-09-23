@@ -68,7 +68,8 @@ position.coords.latitude + "," + position.coords.longitude,true);
 				if(request.status === 200 || request.status === 0){
 					console.log("response: " + request.responseText);
                     var map = JSON.parse(request.responseText);
-                    alert(map.results.locations);
+                    var titleBox = document.getElementById("title");
+                    titleBox.innerHTML = map.results[0].locations[0].adminArea5;
 				}
             }
             
